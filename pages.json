@@ -1,0 +1,252 @@
+{
+	"easycom": {
+		"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
+	},
+	"pages": [
+		{
+			"path": "pages/chat/groupManage/groupAnnouncement"
+		
+		},
+		{
+			"path": "pages/appLogin/appLogin"
+		
+		},
+		{
+			"path": "pages/appLogin/register"
+		
+		},
+		{
+			"path": "pages/chat/chat"
+		
+		},
+		{
+			"path": "pages/chat/systemMessage"
+		
+		},
+		
+		{
+			"path": "pages/my/otherHome"
+		
+		},
+		{
+			"path": "pages/my/systemSettings",
+			"style": {
+				"navigationStyle": "default",
+				"navigationBarTitleText": "系统设置"
+					
+			}
+		
+		},
+		{
+			"path": "pages/appLogin/perfectInfo"
+		
+		},
+		{
+			"path": "pages/topic/topic",
+			"style": {
+				"navigationStyle": "default",
+				"navigationBarTitleText": "话题"
+
+			}
+
+		},
+		{
+			"path": "pages/topic/topicHome"
+		
+		},
+		{
+			"path": "pages/topic/postsDetails",
+			"style": {
+				"navigationStyle": "default",
+				"navigationBarTitleText": "详情"
+		
+			}
+		
+		}, {
+			"path": "pages/topic/createTopic",
+			"style": {
+				"navigationStyle": "default",
+				"navigationBarTitleText": "创建话题"
+			}
+
+		},
+		{
+			"path": "pages/chat/secretGroupChat"
+
+		},
+		{
+			"path": "pages/square/release"
+
+		},
+		{
+			"path": "pages/chat/search"
+
+		},
+		{
+			"path": "pages/topic/searchTopic"
+
+
+		},
+		
+		{
+			"path": "pages/chat/newGroupChat",
+			"style": {
+				"navigationStyle": "default",
+				"navigationBarTitleText": "发起群聊"
+			}
+
+
+		},
+		{
+			"path": "pages/conversation/Group/setsGroup",
+			"style": {
+				"navigationStyle": "default",
+				"navigationBarTitleText": "群聊设置"
+		
+			}
+		
+		},
+		{
+			"path": "pages/square/square"
+
+		}, {
+			"path": "pages/my/my"
+
+		},
+		{
+			"path": "pages/login/login"
+
+		},
+		{
+			"path": "pages/login/register"
+
+		},
+		{
+			"path": "pages/login/confirm"
+
+		},
+		{
+			"path": "pages/conversation/home",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+
+		},
+		{
+			"path": "pages/profile/my"
+
+		},
+		{
+			"path": "pages/profile/editNickname"
+
+		},
+		{
+			"path": "pages/profile/blockList"
+
+		},
+		{
+			"path": "pages/conversation/chatWin"
+
+		},
+		{
+			"path": "pages/mailList/mailList",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+
+		},
+		{
+			"path": "pages/mailList/addFriend"
+
+		},
+		{
+			"path": "pages/mailList/addFriendDetail"
+
+		},
+		{
+			"path": "pages/mailList/newFriends"
+
+		},
+		{
+			"path": "pages/conversation/setFriend"
+
+		},
+		{
+			"path": "pages/mailList/addFriendInput"
+
+		},
+		{
+			"path": "pages/mailList/searchFriend"
+
+		},
+		{
+			"path": "pages/conversation/playVideo"
+		},
+		{
+			"path": "pages/conversation/Group/groupInfo"
+		},
+		{
+			"path": "pages/conversation/Group/launchGroup"
+		},
+		
+		{
+			"path": "pages/conversation/Group/modifyGroup"
+		},
+		{
+			"path": "pages/conversation/Group/modifyGroupName"
+		},
+		{
+			"path": "pages/conversation/Group/deleteGroupMember"
+		},
+		{
+			"path": "pages/conversation/Group/groupMember"
+		},
+		{
+			"path": "pages/conversation/Group/groupAnnouncement"
+		},
+		{
+			"path": "pages/conversation/Group/nickInGroup"
+		},
+		{
+			"path": "pages/mailList/groupNotification"
+		},
+		{
+			"path": "pages/mailList/groupList"
+		},
+		{
+			"path": "pages/conversation/Group/transferOwener"
+		}
+
+	],
+	"globalStyle": {
+		"navigationBarBackgroundColor": "#111111",
+		"backgroundColor": "#111111",
+		"navigationStyle": "custom"
+	},
+	"tabBar": {
+		"color": "#ffffff",
+		"selectedColor": "#2cffb0",
+		"backgroundColor": "#1E1E1E",
+		"list": [{
+				"text": "消息",
+				"pagePath": "pages/chat/chat",
+				"iconPath": "static/chat.png",
+				"selectedIconPath": "static/chat-s.png"
+			},
+			{
+				"text": "广场",
+				"pagePath": "pages/square/square",
+				"iconPath": "static/square.png",
+				"selectedIconPath": "static/square-s.png"
+			},
+			{
+				"text": "我的",
+				"pagePath": "pages/my/my",
+				"iconPath": "static/my.png",
+				"selectedIconPath": "static/my-s.png"
+			}
+
+		]
+	}
+
+}
