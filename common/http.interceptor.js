@@ -2,8 +2,8 @@
 // 同时，我们也可以在此使用getApp().globalData，如果你把token放在getApp().globalData的话，也是可以使用的
 const install = (Vue, vm) => {
 	Vue.prototype.$u.http.setConfig({
-		// baseUrl: 'http://47.112.160.66:50000',
-		baseUrl: 'http://172.16.8.146:51000',
+		// baseUrl: 'http://47.112.160.66:10000',
+		baseUrl: 'http://47.112.160.66:51000',
 		// baseUrl: 'https://lovexuan.ink',
 		// baseUrl: 'http://172.16.8.146:50000',
 		// 如果将此值设置为true，拦截回调中将会返回服务端返回的所有数据response，而不是response.data
@@ -20,6 +20,7 @@ const install = (Vue, vm) => {
 		// console.log(vm);
 		// 方式一，存放在vuex的token，假设使用了uView封装的vuex方式，见：https://uviewui.com/components/globalVariable.html
 		config.header.token = vm.vuex_APPtoken;
+		config.header.openIMToken = vm.vuex_IMtoken;
 		
 		// 方式二，如果没有使用uView封装的vuex方法，那么需要使用$store.state获取
 		// config.header.token = vm.$store.state.token;

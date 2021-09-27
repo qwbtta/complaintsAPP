@@ -2,28 +2,28 @@
 	<view class="otherHome">
 		<view class="main">
 			<view class="headCard">
-				<image src="/static/changeAvatar.png" mode="" class="headIcon"></image>
+				<image :src="userInfo.avatar" mode="" class="headIcon"></image>
 				<view class="headRight">
 
 					<view class="nameCon u-flex">
-						<text class="nickName">这是昵称</text>
+						<text class="nickName">{{userInfo.nickname}}</text>
 						<image src="/static/male.png" mode="" class="gender"></image>
 					</view>
 					<view class="idCon u-flex">
-						<text>ID：1456874354</text>
-						<image src="/static/idCopy.png" mode="" class="copyIcon"></image>
+						<text>ID：{{userInfo.uid}}</text>
+						<image src="/static/idCopy.png" mode="" @click="copy" class="copyIcon"></image>
 					</view>
 
 
-					<view class="relationship">
-						<text class="type">粉丝<text class="num">15</text></text>
-						<text class="type">关注<text class="num">50</text></text>
+					<view class="relationship" v-if="JSON.stringify(userInfo)!='{}'">
+						<text class="type">粉丝<text class="num">{{userInfo.followerList.length}}</text></text>
+						<text class="type">关注<text class="num">{{userInfo.followList.length}}</text></text>
 					</view>
 
 				</view>
 			</view>
 			<view class="desCon">
-				<text class="des">一起失去一段爱情。一个放弃，一个被放弃。与其让曾经的爱情信物在某个角落里变阴霾，不如拿出来和大家分享。这里珍藏纷纷合合的际遇，分道扬镳后的甜蜜情绪。</text>
+				<text class="des">{{userInfo.selfDesc}}</text>
 			</view>
 			<view class="releaseCon">
 				<view class="title u-flex">
@@ -34,14 +34,17 @@
 					<image src="/static/otherNone.png" mode="" class="back"></image>
 				</view>
 			</view>
-			
+
 
 		</view>
 		<view class="footerCon">
-			<view class="btn">
+			<view class="followed btn" v-if="isFollow" @click="unfollow">
+				已关注
+			</view>
+			<view class="follow btn" v-else @click="follow">
 				关注
 			</view>
-			<view class="btn">
+			<view class="follow btn">
 				私聊
 			</view>
 		</view>
@@ -52,11 +55,75 @@
 	export default {
 		data() {
 			return {
-
+				uid:"",
+				userInfo: {},
+				isFollow:false
 			}
 		},
 		methods: {
-
+			copy(){
+				let _this = this
+				uni.setClipboardData({
+					data: _this.userInfo.uid,
+					success: function() {
+						uni.hideToast()
+						uni.showToast({
+							title: '复制成功',
+							duration: 2000
+						});
+					}
+				});
+			},
+			getUserInfo(){
+				this.$u.api.get_user_info_list({
+						uidList: [this.uid],
+						operationId: this.vuex_uid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res, "4444");
+						this.userInfo = res.data.userInfoList[0]
+						this.isFollow = false
+						
+							for (let i = 0; i < res.data.userInfoList[0].followerList.length; i++) {
+								if (res.data.userInfoList[0].followerList[i] == this.vuex_uid) {
+									this.isFollow = true
+									break
+								} 
+							}
+				
+					})
+					.catch(err => {
+						console.log(err);
+					})
+			},
+			follow() {
+				this.$u.api.follow({
+						uid: this.userInfo.uid,
+						operationId: this.vuex_uid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res, "00");
+						this.getUserInfo()
+					})
+					.catch(err => {
+						console.log(err, "1111");
+					})
+			},
+			unfollow() {
+				this.$u.api.unfollow({
+						uid: this.userInfo.uid,
+						operationId: this.vuex_uid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res, "00");
+						this.getUserInfo()
+					})
+					.catch(err => {
+						console.log(err, "1111");
+					})
+			}
+		},
+		onLoad(options) {
+			console.log(options.uid);
+			this.uid = options.uid
+			this.getUserInfo()
 		}
 	}
 </script>
@@ -66,7 +133,7 @@
 		background-image: url(../../static/myBack.png);
 		background-size: 100% 484rpx;
 		padding-top: 190rpx;
-		
+
 		.main {
 			padding: 0 36rpx;
 			padding-top: 40rpx;
@@ -161,6 +228,7 @@
 					font-size: 28rpx;
 					color: #2cffb0;
 					margin-top: 30rpx;
+
 					.releaseIcon {
 						width: 38rpx;
 						height: 36rpx;
@@ -168,38 +236,50 @@
 					}
 				}
 
-				.releaseContent{
+				.releaseContent {
 					height: 754rpx;
 					display: flex;
 					align-items: center;
 					justify-content: center;
-					.back{
+
+					.back {
 						width: 294rpx;
-							height: 224rpx;
+						height: 224rpx;
 					}
 				}
 			}
 
-		
+
 		}
 
-	
-	.footerCon{
-		display: flex;
-		align-items: center;
-		justify-content: space-around;
-		background-color: #1d1e1f;
-		padding-bottom: 30rpx;
-		.btn{
-			width: 280rpx;
+
+		.footerCon {
+			display: flex;
+			align-items: center;
+			justify-content: space-around;
+			background-color: #1d1e1f;
+			padding-bottom: 30rpx;
+			.follow {
+				width: 280rpx;
 				height: 64rpx;
 				background-color: #2cffb0;
 				border-radius: 40rpx;
 				font-size: 28rpx;
-					color: #ffffff;
-					text-align: center;
-					line-height: 64rpx;
+				color: #ffffff;
+				text-align: center;
+				line-height: 64rpx;
+			}
+			.followed {
+				width: 280rpx;
+				height: 64rpx;
+				background-color: rgba(255, 255, 255, 0.3);
+				border-radius: 40rpx;
+				font-size: 28rpx;
+				color: #ffffff;
+				text-align: center;
+				line-height: 64rpx;
+			}
+			
 		}
-	}
 	}
 </style>

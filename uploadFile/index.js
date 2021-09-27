@@ -8,14 +8,14 @@ var that;
 
 const tencentCloudStorageCredential = () => {
 	let parameter = {
-		operationID: "5555555555555555" + Date.now().toString(),
-		token: "11111111111111111111"
+		operationID: that.vuex_uid + Date.now().toString(),
+		token: that.vuex_token
 	}
 	return new Promise((resolve, reject) => {
 		uni.request({
 			method: "POST",
-			url: "http://172.16.8.146:51000/third_service/tencent_cloud_storage_credential",
-			data: parameter,
+			url: "http://47.112.160.66:10000/third/tencent_cloud_storage_credential",
+			data: {},
 			success(res) {
 				resolve(res)
 			},

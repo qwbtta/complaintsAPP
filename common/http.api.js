@@ -32,9 +32,11 @@ const install = (Vue, vm) => {
 	let edit_article = (params = {}) => vm.$u.post('/article/edit_article',params);
 	let unlike = (params = {}) => vm.$u.post('/user/unlike',params);
 	let islike = (params = {}) => vm.$u.post('/user/islike',params);
+	let get_user_info_list = (params = {}) => vm.$u.post('/user/get_user_info_list',params);
+	let get_article_list = (params = {}) => vm.$u.post('/article/get_article_list',params);
 	
 	// 将各个定义的接口名称，统一放进对象挂载到vm.$u.api(因为vm就是this，也即this.$u.api)下
-	vm.$u.api = {register,login,release_article,update_user_info,follow,unfollow,release_commen,like,get_hot_topic,get_my_topic,get_hot_article,get_follow_user_article,get_newest_article,get_son_comment,get_first_comment,get_related_myself_message,get_related_myself_comment,get_myself_received_likes,get_user_fans,get_user_follow,get_user_info,delete_article,edit_article,unlike,islike};
+	vm.$u.api = {register,login,release_article,update_user_info,follow,unfollow,release_commen,like,get_hot_topic,get_my_topic,get_hot_article,get_follow_user_article,get_newest_article,get_son_comment,get_first_comment,get_related_myself_message,get_related_myself_comment,get_myself_received_likes,get_user_fans,get_user_follow,get_user_info,delete_article,edit_article,unlike,islike,get_user_info_list,get_article_list};
 }
 
 export default {

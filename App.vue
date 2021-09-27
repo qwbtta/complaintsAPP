@@ -59,6 +59,30 @@
 			this.initFriendListener();
 			this.setFriendListener();
 		},
+		watch: {
+			vuex_wsLink(val, oldVal) {
+				let _this = this
+				if (val == true) {
+					
+					
+					
+					uni.connectSocket({
+						url: 'ws://47.112.160.66:7778?uid=' + _this.vuex_uid
+					});
+					uni.onSocketOpen(function(res) {
+						console.log('WebSocket连接已打开！');
+					});
+					uni.onSocketError(function(res) {
+						console.log('WebSocket连接打开失败，请检查！');
+					});
+					uni.onSocketMessage(function(res) {
+						console.log('收到服务器内容：',res);
+						console.log('收到服务器内容：' + res.data);
+					});
+				}
+
+			},
+		}
 	};
 </script>
 
@@ -67,6 +91,7 @@
 		height: 100%;
 		background-color: #191919;
 	}
+
 	.btn:active {
 		opacity: 0.8;
 	}
@@ -74,6 +99,4 @@
 
 <style lang="scss">
 	@import "uview-ui/index.scss";
-
-	
 </style>

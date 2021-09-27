@@ -12,7 +12,7 @@ try{
 }
 
 // 需要永久存储，且下次APP启动需要取出的，在state中的变量名
-let saveStateKeys = ['vuex_register_info', 'vuex_user_info','vuex_token','vuex_conversation_user','vuex_mail_list','vuex_group_list','vuex_conversation','vuex_group_info','vuex_APPtoken','vuex_IMtoken','vuex_uid','vuex_avatar','vuex_gender','vuex_nickname'];
+let saveStateKeys = ['vuex_register_info', 'vuex_user_info','vuex_IMinfo','vuex_token','vuex_conversation_user','vuex_mail_list','vuex_group_list','vuex_conversation','vuex_group_info','vuex_APPtoken','vuex_IMtoken','vuex_uid','vuex_avatar','vuex_gender','vuex_nickname'];
 
 // 保存变量到本地存储中
 const saveLifeData = function(key, value){
@@ -34,6 +34,7 @@ const store = new Vuex.Store({
 		// 加上vuex_前缀，是防止变量名冲突，也让人一目了然
 		vuex_register_info: lifeData.vuex_register_info ? lifeData.vuex_register_info : {},
 		vuex_user_info: lifeData.vuex_user_info ? lifeData.vuex_user_info : [],
+		vuex_IMinfo: lifeData.vuex_IMinfo ? lifeData.vuex_IMinfo : {},
 		// 如果vuex_version无需保存到本地永久存储，无需lifeData.vuex_version方式
 		vuex_token:  lifeData.vuex_token ? lifeData.vuex_token : '',
 		vuex_conversation_user:  lifeData.vuex_conversation_user ? lifeData.vuex_conversation_user : '',
@@ -48,6 +49,7 @@ const store = new Vuex.Store({
 		vuex_avatar: lifeData.vuex_avatar ? lifeData.vuex_avatar : '',
 		vuex_gender: lifeData.vuex_gender ? lifeData.vuex_gender : 1,
 		vuex_nickname: lifeData.vuex_nickname ? lifeData.vuex_nickname : '',
+		vuex_wsLink: false
 		
 	},
 	mutations: {

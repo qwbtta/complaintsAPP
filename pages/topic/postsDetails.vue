@@ -3,23 +3,27 @@
 		<view class="mainContentCon">
 			<view class="head">
 				<view class="headLeft">
-					<image src="/static/blockList.png" mode="" class="complaintsImg" @click="goHome"></image>
+					<image :src="userInfo.avatar" mode="" class="complaintsImg" @click="goHome"></image>
 					<view class="desCon">
-						<text class="nickName">昵称昵称</text>
-						<text class="time">2020-10-10 12:20</text>
+						<text class="nickName">{{userInfo.nickname}}</text>
+						<text class="time" v-if="JSON.stringify(article)!='{}'">{{article.createTime.slice(0,10)}}
+							{{article.createTime.slice(11,16)}}</text>
 					</view>
 				</view>
-				<view class="btn">
+				<view class="followed btn" v-if="isFollow" @click="unfollow">
+					已关注
+				</view>
+				<view class="follow btn" v-else @click="follow">
 					关注
 				</view>
 
 			</view>
 
-			<text
-				class="textContent">这是发布的内容这是发布的内容这是发布的内容这是发布的内容这是发布的内容这是发布的内容这是发布的内容这是发布的内容这是发布的内容这是发布的内容这布的内容这是发布的内容这是发布的内容这是发布</text>
+			<text class="textContent">{{article.content}}</text>
+
 			<view class="imgContent">
-				<image src="/static/default.png" mode="aspectFill" class="threeImg" v-for="item in [1,1,1,1,1,1,1,1,1]"
-					@click="previewImage"></image>
+				<image :src="item" mode="aspectFill" class="threeImg" v-for="(item,index) in article.imgUrls"
+					:key="index" @click="previewImage(index)"></image>
 			</view>
 			<view class="topicSpan">
 				<view class="mark">
@@ -36,18 +40,18 @@
 				<view class="footerRight">
 					<view class="footerItem">
 						<image src="/static/liked.png" mode="" class="itemIcon"></image>
-						<text class="itemTitle">11</text>
+						<text class="itemTitle">{{article.likeNum}}</text>
 					</view>
 					<view class="footerItem">
 						<image src="/static/topicComment.png" mode="" class="itemIcon"></image>
-						<text class="itemTitle">22</text>
+						<text class="itemTitle">{{article.commentNum}}</text>
 					</view>
 				</view>
 			</view>
 		</view>
 
 		<view class="commentArea">
-			<text class="commentTitle">所有评论(<text class="commentNum">{{commentNum}}</text>)</text>
+			<text class="commentTitle">所有评论(<text class="commentNum">{{article.commentNum}}</text>)</text>
 			<view class="commentItem" v-for="item in [1,1,1,1]">
 				<image src="/static/blockList.png" mode="" class="headIcon"></image>
 				<view class="commentRight">
@@ -80,20 +84,83 @@
 	export default {
 		data() {
 			return {
-				commentNum: 11
+				commentNum: 11,
+				userInfo: {},
+				article: {},
+				isFollow: false
 			}
 		},
 		methods: {
-			previewImage() {
-				// uni.previewImage({
-				// 	urls: res.tempFilePaths
-				// });
+			previewImage(index) {
+				uni.previewImage({
+					urls: [this.article.imgUrls[index]]
+				});
 			},
-			goHome(){
+			getUserInfo() {
+
+				this.$u.api.get_user_info_list({
+						uidList: [this.article.fromUser],
+						operationId: this.vuex_uid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res, "4444");
+						this.userInfo = res.data.userInfoList[0]
+						this.isFollow = false
+						
+							for (let i = 0; i < res.data.userInfoList[0].followerList.length; i++) {
+								if (res.data.userInfoList[0].followerList[i] == this.vuex_uid) {
+									this.isFollow = true
+									break
+								} 
+							}
+						
+
+					})
+					.catch(err => {
+						console.log(err);
+					})
+			},
+			goHome() {
 				uni.navigateTo({
-					url:'../my/otherHome'
+					url: '../my/otherHome?uid=' + this.userInfo.uid
 				})
+			},
+			follow() {
+				this.$u.api.follow({
+						uid: this.userInfo.uid,
+						operationId: this.vuex_uid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res, "00");
+						this.getUserInfo()
+					})
+					.catch(err => {
+						console.log(err, "1111");
+					})
+			},
+			unfollow() {
+				this.$u.api.unfollow({
+						uid: this.userInfo.uid,
+						operationId: this.vuex_uid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res, "00");
+						this.getUserInfo()
+					})
+					.catch(err => {
+						console.log(err, "1111");
+					})
 			}
+		},
+		onShow() {
+			this.$u.api.get_article_list({
+					articleIdList: ["1631001422549152454"],
+					operationId: this.vuex_uid + JSON.stringify(new Date().getTime())
+				}).then(res => {
+					console.log(res);
+					this.article = res.data[0]
+					this.getUserInfo()
+				})
+				.catch(err => {
+					console.log(err, "err");
+				})
 		}
 	}
 </script>
@@ -142,7 +209,7 @@
 					}
 				}
 
-				.btn {
+				.follow {
 					width: 100rpx;
 					height: 46rpx;
 					background-color: #2cffb0;
@@ -152,6 +219,19 @@
 					line-height: 46rpx;
 					text-align: center;
 				}
+
+				.followed {
+					width: 100rpx;
+					height: 46rpx;
+					background-color: rgba(255, 255, 255, 0.3);
+					border-radius: 12rpx;
+					font-size: 24rpx;
+					color: #ffffff;
+					line-height: 46rpx;
+					text-align: center;
+				}
+
+
 			}
 
 			.textContent {
@@ -244,10 +324,12 @@
 			padding-top: 40rpx;
 			background-color: #111111;
 			padding-bottom: 300rpx;
+
 			.commentTitle {
 				font-size: 28rpx;
 				color: #999999;
 				margin-left: 36rpx;
+
 				.commentNum {
 					font-size: 28rpx;
 					color: #2cffb0;
@@ -259,6 +341,7 @@
 				align-items: flex-start;
 				margin-left: 36rpx;
 				margin-top: 30rpx;
+
 				.headIcon {
 					width: 96rpx;
 					height: 96rpx;
@@ -270,7 +353,7 @@
 				.commentRight {
 					display: flex;
 					flex-direction: column;
-					
+
 					.nickName {
 						font-size: 28rpx;
 						color: #dddddd;
@@ -290,6 +373,7 @@
 						justify-content: space-between;
 						padding-right: 36rpx;
 						border-bottom: 2rpx solid #2f2f2f;
+
 						.time {
 							font-size: 24rpx;
 							color: #999999;
@@ -298,7 +382,7 @@
 						.footerRight {
 							display: flex;
 							align-items: center;
-							
+
 							.footerItem {
 								display: flex;
 								align-items: center;
@@ -314,9 +398,11 @@
 									margin-left: 12rpx;
 								}
 							}
-							.footerItem:nth-of-type(2){
+
+							.footerItem:nth-of-type(2) {
 								margin-left: 40rpx;
 							}
+
 							// .no2{
 							// 	margin-left: 40rpx;
 							// }

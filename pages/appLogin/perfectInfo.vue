@@ -28,7 +28,8 @@
 				nickname: "",
 				gender: 0,
 				avatar: "https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/oG0xUPaAeFLt9a266210615d867291d7fbed30b3f958.png",
-				selfDes: ""
+				selfDes: "",
+				doEdit:false
 			}
 		},
 		methods: {
@@ -65,31 +66,92 @@
 				info.avatar = this.avatar
 				info.operationId = info.account + Date.now().toString()
 				console.log(info);
-				this.$u.api.register(info).then(res => {
-					console.log(res,"registerres");
-					if (res.errCode == 0) {
-						this.$u.api.login({
-								account: info.account,
-								password: info.password,
-								operationId: info.account + JSON.stringify(new Date().getTime())
-							}).then(async res => {
-								console.log(res,"api.login");
-
-								await this.$u.vuex('vuex_uid', res.data.uid)
-								await this.$u.vuex('vuex_APPtoken', res.data.youXXToken)
-								await this.$u.vuex('vuex_IMtoken', res.data.openIMToken)
-
-								this.$openSdk.login(res.data.uid, res.data.openIMToken, (val) => {
-									console.log(val,"valval");
-									
-								});
-								uni.reLaunch({
-									url: '../chat/chat'
+				
+				if(this.doEdit){
+					this.$u.api.update_user_info(info).then(res=>{
+						console.log(res);
+						this.$u.toast('修改成功')
+						uni.navigateBack({
+							delta:1
+						})
+					})
+					.catch(err=>{
+						console.log(err);
+					})
+				}else{
+					this.$u.api.register(info).then(res => {
+							console.log(res, "registerres");
+							if (res.errCode == 0) {
+								this.$u.api.login({
+									account: info.account,
+									password: info.password,
+									operationId: info.account + JSON.stringify(new Date().getTime())
+								}).then(async res => {
+									console.log(res, "api.login");
+					
+									await this.$u.vuex('vuex_uid', res.data.uid)
+									await this.$u.vuex('vuex_APPtoken', res.data.youXXToken)
+					
+									let _this = this
+									let parameter = {
+										secret: "tuoyun",
+										platform: 2,
+										uid: res.data.uid
+									}
+									uni.request({
+										url: "http://47.112.160.66:10000/auth/user_token",
+										method: "POST",
+										data: parameter,
+										success(res) {
+											console.log(res, "换token");
+											_this.$u.vuex('vuex_IMtoken', res.data.data.token)
+					
+											console.log(res.data.data.uid, res.data.data.token);
+											_this.$openSdk.login(res.data.data.uid, res.data.data
+												.token, (val) => {
+													console.log(val, "valval");
+													if (!val.err) {
+														_this.$u.vuex('vuex_wsLink', true)
+														delete info.account
+														delete info.password
+														_this.$u.vuex('vuex_IMinfo', info)
+														uni.reLaunch({
+															url: '../chat/chat'
+														})
+													}
+					
+												});
+										},
+										fail(err) {
+											console.log(err);
+										}
+									});
+					
+					
+					
+					
+					
+					
 								})
-
-							})
-					}
-				})
+							}
+						})
+						.catch(err => {
+							console.log(err, "zhuceerr");
+						})
+				}
+				
+				
+				
+			}
+		},
+		onLoad(options) {
+			if(options.do=="edit"){
+				console.log(this.vuex_IMinfo, "584584");
+				this.doEdit = true
+				this.avatar = this.vuex_IMinfo.avatar
+				this.nickname = this.vuex_IMinfo.nickname 
+				this.gender = this.vuex_IMinfo.gender
+				
 			}
 		}
 	}

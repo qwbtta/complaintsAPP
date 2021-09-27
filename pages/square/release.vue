@@ -62,6 +62,7 @@
 </template>
 
 <script>
+	import uploadFile from '../../uploadFile/index.js'
 	export default {
 		data() {
 			return {
@@ -70,22 +71,30 @@
 				},
 				mainInput: "",
 				checked: false,
-				photoList: ["https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/QB8q6tZhThk05e340e0a7046b7b8ed46a72d25bd3423.png",
-					"https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/n3kiy2q2A3Pzb69530f2d111adf64fbe4e60edd54687.png",
-					"https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/L5XXRyuBpAvYbeb399a5c090f0207126cb04b2d91a51.png",
-					"https://earth-angel-1302656840.cos.ap-chengdu.myqcloud.com/3mRKH5iBId5485298324f016f17874732e5bfae9941e.png"],
+				photoList: [],
 				anonymous: false
 			}
 		},
 		methods: {
-			release() {
+			async release() {
+				let uploadImg = []
+				for (let i = 0; i < this.photoList.length; i++) {
+					var photos = await uploadFile(this.photoList[i], this)
+					uploadImg.push(photos)
+				}
+
+				console.log(uploadImg);
 				this.$u.api.release_article({
 					content: this.mainInput,
 					anonymity: this.anonymous == true ? "1" : "0",
-					imgUrls:this.photoList,
+					imgUrls: uploadImg,
 					operationId: this.vuex_uid + JSON.stringify(new Date().getTime())
 				}).then(res => {
 					console.log(res);
+					this.$u.toast('发布成功')
+					uni.switchTab({
+						url:'./square'
+					})
 				})
 			},
 			chooseImg() {

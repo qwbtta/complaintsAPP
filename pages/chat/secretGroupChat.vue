@@ -86,20 +86,19 @@
 					introduction: "未命名密聊",
 					notification: "暂无公告",
 					faceUrl: "https://echat-1302656840.cos.ap-chengdu.myqcloud.com/1625728198419_IMG20210622085412.jpg",
+					ex: exString
 
 				}
 				let memberList = []
-				// ex: {
-				// 	exString
-				// }
+
 				console.log(groupInfo);
 				this.$openSdk.createGroup(JSON.stringify(groupInfo), JSON.stringify(memberList), (data) => {
 					console.log(data);
 					if (data.msg) {
 						this.$u.toast('创建成功')
-						uni.navigateBack({
-							delta: 1
-						});
+						// uni.navigateBack({
+						// 	delta: 1
+						// });
 					}
 				})
 
@@ -108,8 +107,8 @@
 		},
 		onShow() {
 			console.log(this.vuex_uid);
-			this.$openSdk.getJoinedGroupList(data=>{
-				console.log(data,"datadatadata");
+			this.$openSdk.getJoinedGroupList(data => {
+				console.log(JSON.parse(data.msg));
 			})
 		}
 	}

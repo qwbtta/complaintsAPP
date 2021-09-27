@@ -3,29 +3,29 @@
 		<view class="main">
 			<view class="headCard">
 				<view class="nameCon u-flex">
-					<text class="nickName">这是昵称</text>
-					<view class="btn">
+					<text class="nickName">{{myInfo.nickname}}</text>
+					<view class="btn" @click="edit">
 						<image src="/static/editName.png" mode="" class="editIcon"></image>
 						<text class="editText">编辑</text>
 					</view>
 				</view>
 				<view class="idCon u-flex">
-					<text>ID：1456874354</text>
-					<image src="/static/idCopy.png" mode="" class="copyIcon"></image>
+					<text>ID：{{myInfo.uid}}</text>
+					<image src="/static/idCopy.png" mode="" @click="copy" class="copyIcon"></image>
 				</view>
-				<image src="/static/male.png" mode="" class="gender"></image>
+				<image :src="myInfo.gender==1?'/static/male.png':'/static/female.png'" mode="" class="gender"></image>
 
-				<view class="relationship">
-					<text class="type">粉丝<text class="num">15</text></text>
-					<text class="type">关注<text class="num">50</text></text>
+				<view class="relationship" v-if="JSON.stringify(myInfo)!='{}'">
+					<text class="type">粉丝<text class="num">{{myInfo.followerList.length}}</text></text>
+					<text class="type">关注<text class="num">{{myInfo.followList.length}}</text></text>
 				</view>
 
-				<image src="/static/changeAvatar.png" mode="" class="headIcon"></image>
+				<image :src="myInfo.avatar" mode="" class="headIcon"></image>
 
 
 
 			</view>
-			
+
 			<view class="itemCon">
 				<view class="item">
 					<view class="itemLeft">
@@ -63,7 +63,7 @@
 					<image src="/static/arrow.png" mode="" class="arrow"></image>
 				</view>
 			</view>
-			
+
 		</view>
 
 
@@ -74,15 +74,49 @@
 	export default {
 		data() {
 			return {
-
+				myInfo: {}
 			}
 		},
 		methods: {
-			goSysSet(){
+			goSysSet() {
 				uni.navigateTo({
-					url:'./systemSettings'
+					url: './systemSettings'
+				})
+			},
+			getMyInfo() {
+				this.$u.api.get_user_info_list({
+						uidList: [this.vuex_uid],
+						operationId: this.vuex_uid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res);
+						this.myInfo = res.data.userInfoList[0]
+						this.$u.vuex('vuex_IMinfo', res.data.userInfoList[0])
+					})
+					.catch(err => {
+						console.log(err);
+					})
+			},
+			copy(){
+				let _this = this
+				uni.setClipboardData({
+					data: _this.vuex_uid,
+					success: function() {
+						uni.hideToast()
+						uni.showToast({
+							title: '复制成功',
+							duration: 2000
+						});
+					}
+				});
+			},
+			edit(){
+				uni.navigateTo({
+					url:'../appLogin/perfectInfo?do=edit'
 				})
 			}
+		},
+		onShow() {
+			this.getMyInfo()
 		}
 	}
 </script>
@@ -92,6 +126,7 @@
 		background-image: url(../../static/myBack.png);
 		background-size: 100% 484rpx;
 		padding-top: 260rpx;
+
 		.main {
 			padding-top: 40rpx;
 			height: 1110rpx;
@@ -99,12 +134,13 @@
 			border-top-right-radius: 40rpx;
 			border-top-left-radius: 40rpx;
 			position: relative;
+
 			.headCard {
 				display: flex;
 				flex-direction: column;
 				align-items: flex-start;
 				padding-left: 58rpx;
-				
+
 				.nameCon {
 					.nickName {
 						font-size: 40rpx;
@@ -156,6 +192,7 @@
 					display: flex;
 					align-items: center;
 					margin-top: 20rpx;
+
 					.type {
 						font-size: 28rpx;
 						color: #999999;
@@ -182,38 +219,42 @@
 				}
 
 			}
-			
-			.itemCon{
+
+			.itemCon {
 				padding: 0 36rpx;
 				margin-top: 76rpx;
-				.item{
+
+				.item {
 					// height: 124rpx;
 					margin-bottom: 80rpx;
 					display: flex;
 					align-items: center;
 					justify-content: space-between;
-					.itemLeft{
+
+					.itemLeft {
 						display: flex;
 						align-items: center;
-						.itemIcon{
+
+						.itemIcon {
 							width: 38rpx;
-								height: 38rpx;
+							height: 38rpx;
 						}
-						.itemDes{
+
+						.itemDes {
 							font-size: 32rpx;
-								color: #ffffff;
-								margin-left: 32rpx;
+							color: #ffffff;
+							margin-left: 32rpx;
 						}
 					}
-				
-					.arrow{
+
+					.arrow {
 						width: 14rpx;
-							height: 24rpx;
+						height: 24rpx;
 					}
 				}
 			}
-			
-			
+
+
 		}
 	}
 </style>

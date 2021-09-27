@@ -54,18 +54,47 @@
 						console.log(res);
 						await this.$u.vuex('vuex_uid', res.data.uid)
 						await this.$u.vuex('vuex_APPtoken', res.data.youXXToken)
-						await this.$u.vuex('vuex_IMtoken', res.data.openIMToken)
-						await this.$u.vuex('vuex_token', res.data.openIMToken)
+						let _this = this
+						let parameter = {
+							secret:"tuoyun",
+							platform:2,
+							uid: res.data.uid
+						}
 
-						this.$openSdk.login(res.data.uid, res.data.openIMToken, (val) => {
-							console.log(val, "valval");
-
+						uni.request({
+							url: "http://47.112.160.66:10000/auth/user_token",
+							method: "POST",
+							data: parameter,
+							success(res) {
+								console.log(res,"换token");
+								_this.$u.vuex('vuex_IMtoken', res.data.data.token)
+								
+								_this.$openSdk.login(res.data.data.uid, res.data.data.token, (val) => {
+									console.log(val,"valval");
+									if (!val.err){
+										_this.$u.vuex('vuex_wsLink',true)
+										_this.$u.api.get_user_info_list({
+												uidList: [_this.vuex_uid],
+												operationId: _this.vuex_uid + JSON.stringify(new Date().getTime())
+											}).then(res => {
+												console.log(res);
+												_this.$u.vuex('vuex_IMinfo',res.data.userInfoList[0])
+												uni.reLaunch({
+													url: '../chat/chat'
+												})
+											})
+											.catch(err => {
+												console.log(err);
+											})
+										
+									}
+									
+								});
+							},
+							fail(err) {
+								console.log(err);
+							}
 						});
-
-
-						uni.reLaunch({
-							url: '../chat/chat'
-						})
 
 					})
 					.catch(res => {

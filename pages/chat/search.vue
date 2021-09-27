@@ -18,31 +18,32 @@
 			<view class="searchCon">
 				<image src="/static/searchX.png" mode="" class="searchIcon"></image>
 				<input type="text" value="" class="searchInput" placeholder="搜索好友ID/账号" v-model="searchPeople"
-					@confirm="search" />
+					@confirm="search('people')" />
 			</view>
-			<view class="hotItem" v-for="(index,item) in [1,2,3,4,5]" :key="index">
-				<image src="/static/edit.png" mode="" class="headIcon"></image>
+			<view class="hotItem" v-if="JSON.stringify(peopleRes)!='{}'">
+				<image :src="peopleRes.avatar" mode="" class="headIcon"></image>
 				<view class="right">
 					<view class="describe">
-						<text class="title">真心话</text>
-						<text class="des">请问请问群二群群二群翁群</text>
+						<text class="title">{{peopleRes.nickname}}</text>
+						<text class="des">{{peopleRes.selfDesc==''?'TA还没有自我描述':peopleRes.selfDesc}}</text>
 					</view>
-					<view class="follow btn">
-						加入
-					</view>
-					<!-- <view class="followed btn">
+
+					<view class="followed btn" v-if="peopleRes.isFollow" @click="unfollow">
 						已关注
-					</view> -->
+					</view>
+					<view class="follow btn" v-else @click="follow">
+						关注
+					</view>
 				</view>
 			</view>
-			<!-- <view class="backCon">
+			<view class="backCon" v-if="defaultBack">
 				<image src="/static/default.png" mode="" class="backImg"></image>
 				<text class="backDes">发现更多趣事～</text>
 			</view>
-			<view class="backCon">
+			<view class="backCon" v-if="noRes">
 				<image src="/static/none.png" mode="" class="backImg"></image>
 				<text class="backDes">暂无搜索结果</text>
-			</view> -->
+			</view>
 		</view>
 		<view class="people" v-show="selectedIndex==1">
 			<view class="searchCon">
@@ -71,7 +72,10 @@
 				tabs: ["找人", "找群"],
 				selectedIndex: 0,
 				searchPeople: "",
-				searchGroup:""
+				searchGroup: "",
+				peopleRes: {},
+				noRes:false,
+				defaultBack:true
 			}
 		},
 		methods: {
@@ -79,9 +83,60 @@
 				this.selectedIndex = index
 
 			},
-			search() {
-				console.log("ddddddddddddddddddddddd");
+			search(e) {
+				if (e == "people") {
+					this.$u.api.get_user_info_list({
+						uidList: [this.searchPeople],
+						operationId: this.vuex_uid + JSON.stringify(new Date().getTime())
+					}).then(res => {
+						console.log(res);
+						this.noRes = false
+						this.defaultBack = false
+						this.peopleRes = res.data.userInfoList[0]
+						this.peopleRes.isFollow = false
+						for (let i = 0; i < res.data.userInfoList[0].followerList; i++) {
+							if (res.data.userInfoList[0].followerList[i] == this.vuex_uid) {
+								this.peopleRes.isFollow = true
+								break
+							}
+						}
+
+					})
+					.catch(err=>{
+						console.log(err);
+						this.noRes = true
+						this.defaultBack = false
+					})
+				}
+
+			},
+			follow(){
+				this.$u.api.follow({
+					uid: this.peopleRes.uid,
+					operationId: this.vuex_uid + JSON.stringify(new Date().getTime())
+				}).then(res=>{
+					console.log(res,"00");
+					this.search("people")
+				})
+				.catch(err=>{
+					console.log(err,"1111");
+				})
+			},
+			unfollow(){
+				this.$u.api.unfollow({
+					uid: this.peopleRes.uid,
+					operationId: this.vuex_uid + JSON.stringify(new Date().getTime())
+				}).then(res=>{
+					console.log(res,"00");
+					this.search("people")
+				})
+				.catch(err=>{
+					console.log(err,"1111");
+				})
 			}
+		},
+		onShow() {
+			
 		}
 	}
 </script>
@@ -89,7 +144,7 @@
 
 <style lang="scss" scoped>
 	.search {
-		
+
 		.middle {
 			display: flex;
 			align-items: center;
@@ -131,6 +186,7 @@
 				align-items: center;
 				position: relative;
 				margin: 40rpx 0;
+
 				.searchIcon {
 					width: 30rpx;
 					height: 30rpx;
@@ -151,11 +207,12 @@
 				}
 
 			}
+
 			.hotItem {
 				height: 180rpx;
 				display: flex;
 				align-items: center;
-			
+
 				.headIcon {
 					width: 120rpx;
 					height: 120rpx;
@@ -163,7 +220,7 @@
 					margin: 0 36rpx;
 					flex-shrink: 0;
 				}
-			
+
 				.right {
 					display: flex;
 					align-items: center;
@@ -171,22 +228,23 @@
 					border-bottom: solid 2rpx #2f2f2f;
 					height: 180rpx;
 					width: 100%;
+
 					.describe {
 						display: flex;
 						flex-direction: column;
-			
+
 						.title {
 							font-size: 32rpx;
 							color: #ffffff;
 						}
-			
+
 						.des {
 							font-size: 24rpx;
 							color: #ffffff;
 							margin-top: 30rpx;
 						}
 					}
-			
+
 					.follow {
 						width: 100rpx;
 						height: 46rpx;
@@ -198,6 +256,7 @@
 						text-align: center;
 						margin-right: 36rpx;
 					}
+
 					.followed {
 						width: 100rpx;
 						height: 46rpx;
@@ -211,6 +270,7 @@
 					}
 				}
 			}
+
 			.backCon {
 				margin: 0 auto;
 				margin-top: 304rpx;
